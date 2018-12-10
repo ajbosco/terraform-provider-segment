@@ -4,6 +4,9 @@ BUILD_DIR := $(shell pwd)/build
 TARGET := ${BUILD_DIR}/${NAME}
 LDFLAGS ?=
 
+# List the GOOS and GOARCH to build
+GOOSARCHES = $(shell cat .goosarch)
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -34,3 +37,15 @@ test: ## Runs the go tests.
 .PHONY: vet
 vet: ## Verifies `go vet` passes.
 	@go vet $(shell go list ./... | grep -v vendor) | tee /dev/stderr
+
+define buildrelease
+GOOS=$(1) GOARCH=$(2) go build \
+	 -ldflags "$(LDFLAGS)" \
+	 -o $(BUILD_DIR)/$(NAME)-$(1)-$(2);
+md5sum $(BUILD_DIR)/$(NAME)-$(1)-$(2) > $(BUILD_DIR)/$(NAME)-$(1)-$(2).md5;
+sha256sum $(BUILD_DIR)/$(NAME)-$(1)-$(2) > $(BUILD_DIR)/$(NAME)-$(1)-$(2).sha256;
+endef
+
+.PHONY: release
+release: ## Builds the cross-compiled binaries, naming them in such a way for release (eg. binary-GOOS-GOARCH).
+	@$(foreach GOOSARCH,$(GOOSARCHES), $(call buildrelease,$(subst /,,$(dir $(GOOSARCH))),$(notdir $(GOOSARCH))))
