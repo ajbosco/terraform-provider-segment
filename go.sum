@@ -2,6 +2,8 @@ github.com/agext/levenshtein v1.2.1 h1:QmvMAjj2aEICytGiWzmxoE0x2KZvE0fvmqMOfy2tj
 github.com/agext/levenshtein v1.2.1/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/ajbosco/segment-config-go v0.1.0 h1:FT2X+DSsBTVl+jL/WXldfvTE4QWIdqLnjmpp2Nfxp8Q=
 github.com/ajbosco/segment-config-go v0.1.0/go.mod h1:f+rLFCLd9lq60T4ze+oGTMCbL4a9EHxIigR+NyhkfME=
+github.com/ajbosco/segment-config-go v0.2.0 h1:qk5Z5yLkEjtysC3YvehLb4a+KvT00KA44W+u/WUVzHU=
+github.com/ajbosco/segment-config-go v0.2.0/go.mod h1:f+rLFCLd9lq60T4ze+oGTMCbL4a9EHxIigR+NyhkfME=
 github.com/apparentlymart/go-cidr v1.0.0 h1:lGDvXx8Lv9QHjrAVP7jyzleG4F9+FkRhJcEsDFxeb8w=
 github.com/apparentlymart/go-cidr v1.0.0/go.mod h1:EBcsNrHc3zQeuaeCeCtQruQm+n9/YjEn/vI25Lg7Gwc=
 github.com/apparentlymart/go-dump v0.0.0-20180507223929-23540a00eaa3/go.mod h1:oL81AME2rN47vu18xqj1S1jPIPuN7afo62yKTNn3XMM=

@@ -26,9 +26,6 @@ func Provider() terraform.ResourceProvider {
 			"segment_source":      resourceSegmentSource(),
 			"segment_destination": resourceSegmentDestination(),
 		},
-		// DataSourcesMap: map[string]*schema.Resource{
-		// 	"segment_project": dataSourceSegmentProject(),
-		// },
 		ConfigureFunc: configureFunc(),
 	}
 }

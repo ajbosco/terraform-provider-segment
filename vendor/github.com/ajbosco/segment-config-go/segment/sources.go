@@ -26,11 +26,11 @@ func (c *Client) ListSources() (Sources, error) {
 }
 
 // GetSource returns information about a source
-func (c *Client) GetSource(src string) (Source, error) {
+func (c *Client) GetSource(srcName string) (Source, error) {
 	var s Source
 	data, err := c.doRequest(http.MethodGet,
 		fmt.Sprintf("%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName),
 		nil)
 	if err != nil {
 		return s, err
@@ -44,8 +44,14 @@ func (c *Client) GetSource(src string) (Source, error) {
 }
 
 // CreateSource creates a new source
-func (c *Client) CreateSource(src Source) (Source, error) {
+func (c *Client) CreateSource(srcName string, catName string) (Source, error) {
 	var s Source
+	srcFullName := fmt.Sprintf("%s/%s/%s/%s",
+		WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName)
+	src := Source{
+		Name:        srcFullName,
+		CatalogName: catName,
+	}
 	req := sourceCreateRequest{src}
 	data, err := c.doRequest(http.MethodPost,
 		fmt.Sprintf("%s/%s/%s",
@@ -63,10 +69,10 @@ func (c *Client) CreateSource(src Source) (Source, error) {
 }
 
 // DeleteSource deletes a source from the workspace
-func (c *Client) DeleteSource(src string) error {
+func (c *Client) DeleteSource(srcName string) error {
 	_, err := c.doRequest(http.MethodDelete,
 		fmt.Sprintf("%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName),
 		nil)
 	if err != nil {
 		return err
