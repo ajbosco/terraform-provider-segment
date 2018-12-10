@@ -1,7 +1,7 @@
 module github.com/ajbosco/terraform-provider-segment
 
 require (
-	github.com/ajbosco/segment-config-go v0.1.0
+	github.com/ajbosco/segment-config-go v0.2.0
 	github.com/apparentlymart/go-cidr v1.0.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/hashicorp/go-getter v0.0.0-20181119194526-bd1edc22f8ea // indirect

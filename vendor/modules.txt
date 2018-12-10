@@ -1,6 +1,6 @@
 # github.com/agext/levenshtein v1.2.1
 github.com/agext/levenshtein
-# github.com/ajbosco/segment-config-go v0.1.0
+# github.com/ajbosco/segment-config-go v0.2.0
 github.com/ajbosco/segment-config-go/segment
 # github.com/apparentlymart/go-cidr v1.0.0
 github.com/apparentlymart/go-cidr/cidr

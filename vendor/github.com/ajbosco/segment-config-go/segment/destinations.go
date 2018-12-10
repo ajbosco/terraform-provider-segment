@@ -9,11 +9,11 @@ import (
 )
 
 // ListDestinations returns all destinations for a source
-func (c *Client) ListDestinations(src string) (Destinations, error) {
+func (c *Client) ListDestinations(srcName string) (Destinations, error) {
 	var d Destinations
 	data, err := c.doRequest(http.MethodGet,
 		fmt.Sprintf("%s/%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src, DestinationEndpoint),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint),
 		nil)
 	if err != nil {
 		return d, err
@@ -27,11 +27,11 @@ func (c *Client) ListDestinations(src string) (Destinations, error) {
 }
 
 // GetDestination returns information about a destination for a source
-func (c *Client) GetDestination(src string, dest string) (Destination, error) {
+func (c *Client) GetDestination(srcName string, destName string) (Destination, error) {
 	var d Destination
 	data, err := c.doRequest(http.MethodGet,
 		fmt.Sprintf("%s/%s/%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src, DestinationEndpoint, dest),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint, destName),
 		nil)
 	if err != nil {
 		return d, err
@@ -45,12 +45,20 @@ func (c *Client) GetDestination(src string, dest string) (Destination, error) {
 }
 
 // CreateDestination creates a new destination for a source
-func (c *Client) CreateDestination(src string, dest Destination) (Destination, error) {
+func (c *Client) CreateDestination(srcName string, destName string, connMode string, enabled bool, configs []DestinationConfig) (Destination, error) {
 	var d Destination
+	destFullName := fmt.Sprintf("%s/%s/%s/%s/%s/%s",
+		WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint, destName)
+	dest := Destination{
+		Name:           destFullName,
+		ConnectionMode: connMode,
+		Enabled:        enabled,
+		Configs:        configs,
+	}
 	req := destinationCreateRequest{dest}
 	data, err := c.doRequest(http.MethodPost,
 		fmt.Sprintf("%s/%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src, DestinationEndpoint),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint),
 		req)
 	if err != nil {
 		return d, err
@@ -63,11 +71,11 @@ func (c *Client) CreateDestination(src string, dest Destination) (Destination, e
 	return d, nil
 }
 
-// DeleteDestinaton deletes a destination for a source from the workspace
-func (c *Client) DeleteDestinaton(src string, dest string) error {
+// DeleteDestination deletes a destination for a source from the workspace
+func (c *Client) DeleteDestination(srcName string, destName string) error {
 	_, err := c.doRequest(http.MethodDelete,
 		fmt.Sprintf("%s/%s/%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src, DestinationEndpoint, dest),
+			WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint, destName),
 		nil)
 	if err != nil {
 		return err
@@ -77,13 +85,17 @@ func (c *Client) DeleteDestinaton(src string, dest string) error {
 }
 
 // UpdateDestination updates an existing destination with a new config
-func (c *Client) UpdateDestination(src string, dest string, destConfig Destination, updateMask UpdateMask) (Destination, error) {
+func (c *Client) UpdateDestination(srcName string, destName string, enabled bool, configs []DestinationConfig) (Destination, error) {
 	var d Destination
-	req := destinationUpdateRequest{Destination: destConfig, UpdateMask: updateMask}
-	data, err := c.doRequest(http.MethodPatch,
-		fmt.Sprintf("%s/%s/%s/%s/%s/%s",
-			WorkspacesEndpoint, c.workspace, SourceEndpoint, src, DestinationEndpoint, dest),
-		req)
+	destFullName := fmt.Sprintf("%s/%s/%s/%s/%s/%s",
+		WorkspacesEndpoint, c.workspace, SourceEndpoint, srcName, DestinationEndpoint, destName)
+	dest := Destination{
+		Name:    destFullName,
+		Enabled: enabled,
+		Configs: configs,
+	}
+	req := destinationUpdateRequest{dest, UpdateMask{Paths: []string{"destination.config", "destination.enabled"}}}
+	data, err := c.doRequest(http.MethodPatch, destFullName, req)
 	if err != nil {
 		return d, err
 	}

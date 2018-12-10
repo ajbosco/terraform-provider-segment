@@ -1,8 +1,6 @@
 package segment
 
 import (
-	"strings"
-
 	"github.com/ajbosco/segment-config-go/segment"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -63,61 +61,43 @@ func resourceSegmentDestinationCreate(r *schema.ResourceData, meta interface{}) 
 	enabled := r.Get("enabled").(bool)
 	configs := r.Get("configs").(*schema.Set)
 
-	newDest := segment.Destination{
-		Name:           destName,
-		Enabled:        enabled,
-		ConnectionMode: connMode,
-		Configs:        extractConfigs(configs),
-	}
-
-	dest, err := client.CreateDestination(srcName, newDest)
+	dest, err := client.CreateDestination(srcName, destName, connMode, enabled, extractConfigs(configs))
 	if err != nil {
 		return err
 	}
 
-	// the id of the destination is the last value in the name path
-	splitName := strings.Split(dest.Name, "/")
-	id := splitName[len(splitName)-1]
-	r.SetId(id)
+	r.SetId(dest.Name)
 
 	return resourceSegmentDestinationRead(r, meta)
 }
 
 func resourceSegmentDestinationRead(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	destName := r.Id()
 	srcName := r.Get("source_name").(string)
+	id := r.Id()
+	destName := idToName(id)
 
 	d, err := client.GetDestination(srcName, destName)
 	if err != nil {
 		return err
 	}
 
-	r.Set("name", d.Name)
-	r.Set("connection_mod", d.ConnectionMode)
 	r.Set("enabled", d.Enabled)
 	r.Set("configs", d.Configs)
+	r.Set("connection_mode", d.ConnectionMode)
 
 	return nil
 }
 
 func resourceSegmentDestinationUpdate(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	destID := r.Id()
-	destName := r.Get("destination_name").(string)
 	srcName := r.Get("source_name").(string)
 	configs := r.Get("configs").(*schema.Set)
 	enabled := r.Get("enabled").(bool)
+	id := r.Id()
+	destName := idToName(id)
 
-	dest := segment.Destination{
-		Name:    destName,
-		Enabled: enabled,
-		Configs: extractConfigs(configs),
-	}
-	// updateMask determines which fields Segment will update
-	updateMask := segment.UpdateMask{Paths: []string{"destination.config", "destination.enabled"}}
-
-	_, err := client.UpdateDestination(srcName, destID, dest, updateMask)
+	_, err := client.UpdateDestination(srcName, destName, enabled, extractConfigs(configs))
 	if err != nil {
 		return err
 	}
@@ -127,10 +107,11 @@ func resourceSegmentDestinationUpdate(r *schema.ResourceData, meta interface{}) 
 
 func resourceSegmentDestinationDelete(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	destName := r.Id()
 	srcName := r.Get("source_name").(string)
+	id := r.Id()
+	destName := idToName(id)
 
-	err := client.DeleteDestinaton(srcName, destName)
+	err := client.DeleteDestination(srcName, destName)
 	if err != nil {
 		return err
 	}
