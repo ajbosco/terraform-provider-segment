@@ -1,6 +1,9 @@
 package segment
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/ajbosco/segment-config-go/segment"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -50,6 +53,9 @@ func resourceSegmentDestination() *schema.Resource {
 		Read:   resourceSegmentDestinationRead,
 		Update: resourceSegmentDestinationUpdate,
 		Delete: resourceSegmentDestinationDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceSegmentDestinationImport,
+		},
 	}
 }
 
@@ -117,6 +123,37 @@ func resourceSegmentDestinationDelete(r *schema.ResourceData, meta interface{}) 
 	}
 
 	return nil
+}
+
+func resourceSegmentDestinationImport(r *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*segment.Client)
+	s := strings.SplitN(r.Id(), "/", 2)
+	if len(s) != 2 {
+		return nil, fmt.Errorf(
+			"invalid destination import format: %s (expected <SOURCE-NAME>/<DESTINATION-NAME>)",
+			r.Id(),
+		)
+	}
+
+	srcName := s[0]
+	destName := s[1]
+
+	d, err := client.GetDestination(srcName, destName)
+	if err != nil {
+		return nil, fmt.Errorf("invalid destination: %q; err: %v", r.Id(), err)
+	}
+
+	r.SetId(d.Name)
+	r.Set("source_name", srcName)
+	r.Set("destination_name", destName)
+	r.Set("enabled", d.Enabled)
+	r.Set("configs", d.Configs)
+	r.Set("connection_mode", d.ConnectionMode)
+
+	results := make([]*schema.ResourceData, 1)
+	results[0] = r
+
+	return results, nil
 }
 
 func extractConfigs(s *schema.Set) []segment.DestinationConfig {

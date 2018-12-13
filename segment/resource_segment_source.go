@@ -1,6 +1,7 @@
 package segment
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/ajbosco/segment-config-go/segment"
@@ -24,6 +25,9 @@ func resourceSegmentSource() *schema.Resource {
 		Create: resourceSegmentSourceCreate,
 		Read:   resourceSegmentSourceRead,
 		Delete: resourceSegmentSourceDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceSegmentSourceImport,
+		},
 	}
 }
 
@@ -70,6 +74,22 @@ func resourceSegmentSourceDelete(r *schema.ResourceData, meta interface{}) error
 	}
 
 	return nil
+}
+
+func resourceSegmentSourceImport(r *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*segment.Client)
+	s, err := client.GetSource(r.Id())
+	if err != nil {
+		return nil, fmt.Errorf("invalid source: %q; err: %v", r.Id(), err)
+	}
+
+	r.SetId(s.Name)
+	r.Set("catalog_name", s.CatalogName)
+
+	results := make([]*schema.ResourceData, 1)
+	results[0] = r
+
+	return results, nil
 }
 
 func idToName(id string) string {

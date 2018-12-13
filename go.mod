@@ -4,6 +4,7 @@ require (
 	github.com/ajbosco/segment-config-go v0.2.0
 	github.com/apparentlymart/go-cidr v1.0.0 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/hashicorp/go-getter v0.0.0-20181119194526-bd1edc22f8ea // indirect
 	github.com/hashicorp/go-hclog v0.0.0-20181001195459-61d530d6c27f // indirect
 	github.com/hashicorp/go-plugin v0.0.0-20181030172320-54b6ff97d818 // indirect
