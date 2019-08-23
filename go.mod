@@ -13,7 +13,7 @@ require (
 	github.com/hashicorp/hcl2 v0.0.0-20181208003705-670926858200 // indirect
 	github.com/hashicorp/hil v0.0.0-20170627220502-fa9f258a9250 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
-	github.com/hashicorp/terraform v0.11.10
+	github.com/hashicorp/terraform v0.12.7
 	github.com/mitchellh/cli v1.0.0 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/hashstructure v1.0.0 // indirect
