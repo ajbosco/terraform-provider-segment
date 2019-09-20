@@ -3,6 +3,7 @@ package segment
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/fenderdigital/segment-apis-go/segment"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -14,22 +15,18 @@ func resourceSegmentTrackingPlan() *schema.Resource {
 			"display_name": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"rules": {
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
-			},
-			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 		},
 		Create: resourceSegmentTrackingPlanCreate,
 		Read:   resourceSegmentTrackingPlanRead,
 		Delete: resourceSegmentTrackingPlanDelete,
+		Update: resourceSegmentTrackingPlanUpdate,
 	}
 }
 
@@ -45,22 +42,21 @@ func resourceSegmentTrackingPlanCreate(r *schema.ResourceData, meta interface{})
 		return err
 	}
 
-	r.SetId(trackingPlan.Name)
-	r.Set("name", trackingPlan.Name)
-
+	planName := parseNameID(trackingPlan.Name)
+	r.SetId(planName)
 	return resourceSegmentTrackingPlanRead(r, meta)
 }
 
 func resourceSegmentTrackingPlanRead(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	planName := r.Get("name").(string)
+	planName := r.Id()
 	trackingPlan, err := client.GetTrackingPlan(planName)
 	if err != nil {
 		return err
 	}
 
 	s, _ := json.Marshal(trackingPlan.Rules)
-	r.Set("name", trackingPlan.Name)
+	r.Set("display_name", trackingPlan.DisplayName)
 	r.Set("rules", string(s))
 
 	return nil
@@ -68,7 +64,7 @@ func resourceSegmentTrackingPlanRead(r *schema.ResourceData, meta interface{}) e
 
 func resourceSegmentTrackingPlanDelete(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	planName := r.Get("name").(string)
+	planName := r.Id()
 
 	err := client.DeleteTrackingPlan(planName)
 	if err != nil {
@@ -80,7 +76,7 @@ func resourceSegmentTrackingPlanDelete(r *schema.ResourceData, meta interface{})
 
 func resourceSegmentTrackingPlanUpdate(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
-	planName := r.Get("name").(string)
+	planName := r.Id()
 	rules := r.Get("rules").(string)
 	displayName := r.Get("display_name").(string)
 
@@ -96,5 +92,11 @@ func resourceSegmentTrackingPlanUpdate(r *schema.ResourceData, meta interface{})
 	if err != nil {
 		return err
 	}
+
 	return resourceSegmentTrackingPlanRead(r, meta)
+}
+
+func parseNameID(name string) string {
+	nameSplit := strings.Split(name, "/")
+	return nameSplit[len(nameSplit)-1]
 }
