@@ -78,13 +78,13 @@ func resourceSegmentTrackingPlanDelete(r *schema.ResourceData, meta interface{})
 	return nil
 }
 
-/*
 func resourceSegmentTrackingPlanUpdate(r *schema.ResourceData, meta interface{}) error {
 	client := meta.(*segment.Client)
 	planName := r.Get("name").(string)
-	paths := r.Get("paths").([]string)
 	rules := r.Get("rules").(string)
 	displayName := r.Get("display_name").(string)
+
+	paths := []string{"tracking_plan.display_name", "tracking_plan.rules"}
 
 	s := segment.Rules{}
 	json.Unmarshal([]byte(rules), &s)
@@ -98,4 +98,3 @@ func resourceSegmentTrackingPlanUpdate(r *schema.ResourceData, meta interface{})
 	}
 	return resourceSegmentTrackingPlanRead(r, meta)
 }
-*/
