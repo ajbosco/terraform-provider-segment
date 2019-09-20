@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform/plugin"
 	"github.com/hashicorp/terraform/terraform"
 
-	"github.com/ajbosco/terraform-provider-segment/segment"
+	"github.com/fenderdigital/terraform-provider-segment/segment"
 )
 
 func main() {

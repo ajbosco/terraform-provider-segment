@@ -1,7 +1,7 @@
 package segment
 
 import (
-	"github.com/ajbosco/segment-config-go/segment"
+	"github.com/fenderdigital/segment-apis-go/segment"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -23,8 +23,9 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"segment_source":      resourceSegmentSource(),
-			"segment_destination": resourceSegmentDestination(),
+			"segment_source":        resourceSegmentSource(),
+			"segment_destination":   resourceSegmentDestination(),
+			"segment_tracking_plan": resourceSegmentTrackingPlan(),
 		},
 		ConfigureFunc: configureFunc(),
 	}
